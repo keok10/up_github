@@ -1,0 +1,48 @@
+streamlit/
+├── main.py                   # アプリのエントリーポイント
+├── display.py                # サイドバーや共通UIコンポーネント
+├── function.py               # 共通関数
+├── pages/                    # 各機能ページのフォルダ
+│   ├── marketing/            # マーケティング関連
+│   │   ├── timeline.py
+│   │   ├── ltv.py
+│   │   ├── nps.py
+│   │   └── sankey_diagram.py
+│   ├── sales/                # 販売関連
+│   │   ├── sales.py
+│   │   └── category_sales.py
+│   ├── finance/              # 財務関連
+│       ├── cashflow.py
+│       ├── profitability.py
+│       └── liquidity.py
+├── datagenarate/　# サンプルデータの作成
+│   ├── new_genarate/          # 新しくデータを作る
+│   │   ├── genarate_log_view_countcheck.py
+│   │   ├── genarate_sample_category.py
+│   │   ├── genarate_sample_log_view.py
+│   │   └── genarate_sample_orders.py
+│   │   └── genarate_sample_products.py
+│   │   └── genarate_sample_reviews.py
+│   │   └── genarate_sample_users.py
+│   ├── add_genarate/          # 元々あるデータに追加作成する
+│   │   ├── genarate_add_log_view.py
+│   │   └── genarate_products_add_itemurl.py
+│   │   └── genarate_products_add_price.py
+├── csv_data/                 # csvデータに追加作成する
+│   ├── user_roles.csv
+│   ├── users.csv
+│   ├── order_items.csv
+│   ├── orders.csv
+│   ├── page_views.csv
+│   ├── products_product_feedback.csv
+│   ├── products_product_reviews.csv
+│   ├── products.csv
+├── minimum_csv_data/         # 便宜上集計したデータ　ここからデータ取得して可視化
+│   ├── 
+│   └── 
+├── README.md                 # リポジトリの概要や使い方
+├── treemap.txt # streamlitより下層の構造がどうなってるかツリーマップ
+├── requirements.txt          # 必要なPythonライブラリ
+├── tests/                    # テスト用コード
+│   ├── 
+│   └── 

@@ -1,0 +1,17 @@
+.env*
+.env.mysql.DS_Store
+Library/
+Pictures/
+.DS_Store
+.Trash/
+*.pyc
+__pycache__/
+streamlit/csv_data/
+
+!fx_trade/
+!streamlit/
+!x_botter/
+!fonts/
+!requirements.txt
+!scraping/
+!venv/
