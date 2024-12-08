@@ -1,0 +1,70 @@
+category_id,parent_id,level,name_en,url,description
+1,,1,トップページ,https://example-test-flower.jp,ホーム
+2,2.0,3,花・観葉植物,https://example-test-flower.jp/category/flowers_and_plants,カテゴリ
+3,3.0,4,花束・切花,https://example-test-flower.jp/category/flowers_and_plants/bouquets_and_cut_flowers,サブカテゴリ
+4,4.0,5,バラ,https://example-test-flower.jp/category/flowers_and_plants/bouquets_and_cut_flowers/Rose,小カテゴリ
+5,2.0,3,商品ページ,https://example-test-flower.jp/item/{商品番号},商品
+6,1.0,2,カート,https://example-test-flower.jp/cart/,購入フロー
+7,1.0,2,カート（2ページ目）,https://example-test-flower.jp/carts_v2/,購入フロー
+8,1.0,2,注文完了ページ,https://example-test-flower.jp/sanks/,購入フロー
+9,1.0,2,お問い合わせ,https://example-test-flower.jp/contact_1/,サポート
+10,1.0,2,お問い合わせ内容確認,https://example-test-flower.jp/contact_2/,サポート
+11,1.0,2,お問い合わせ送信完了,https://example-test-flower.jp/contact_3/,サポート
+12,2.0,3,特集ページ（誕生花 1月）,https://example-test-flower.jp/category/birthday-flower,特集
+13,3.0,4,特集ページ（誕生花 1月）,https://example-test-flower.jp/category/birthday-flower/jan,特集
+14,3.0,4,特集ページ（誕生花 2月）,https://example-test-flower.jp/category/birthday-flower/feb,特集
+15,3.0,4,特集ページ（誕生花 3月）,https://example-test-flower.jp/category/birthday-flower/mar,特集
+16,3.0,4,特集ページ（誕生花 4月）,https://example-test-flower.jp/category/birthday-flower/apr,特集
+17,3.0,4,特集ページ（誕生花 5月）,https://example-test-flower.jp/category/birthday-flower/may,特集
+18,3.0,4,特集ページ（誕生花 6月）,https://example-test-flower.jp/category/birthday-flower/jun,特集
+19,3.0,4,特集ページ（誕生花 7月）,https://example-test-flower.jp/category/birthday-flower/jul,特集
+20,3.0,4,特集ページ（誕生花 8月）,https://example-test-flower.jp/category/birthday-flower/aug,特集
+21,3.0,4,特集ページ（誕生花 9月）,https://example-test-flower.jp/category/birthday-flower/sep,特集
+22,3.0,4,特集ページ（誕生花 10月）,https://example-test-flower.jp/category/birthday-flower/oct,特集
+23,3.0,4,特集ページ（誕生花 11月）,https://example-test-flower.jp/category/birthday-flower/nov,特集
+24,3.0,4,特集ページ（誕生花 12月）,https://example-test-flower.jp/category/birthday-flower/dec,特集
+25,3.0,4,特集ページ（結婚）,https://example-test-flower.jp/category/event/wedding,イベント
+26,3.0,4,特集ページ（誕生日）,https://example-test-flower.jp/category/event/birthday,イベント
+27,3.0,4,特集ページ（送別・退職）,https://example-test-flower.jp/category/event/farewell,イベント
+28,3.0,4,特集ページ（母の日）,https://example-test-flower.jp/category/event/mothers-day,イベント
+29,3.0,4,特集ページ（出産）,https://example-test-flower.jp/category/event/baby-shower,イベント
+30,3.0,4,特集ページ（卒業・入学）,https://example-test-flower.jp/category/event/graduation,イベント
+31,3.0,4,特集ページ（引越し・改装）,https://example-test-flower.jp/category/event/housewarming,イベント
+32,3.0,4,特集ページ（ホワイトデー）,https://example-test-flower.jp/category/event/white-day,イベント
+33,3.0,4,特集ページ（クリスマス）,https://example-test-flower.jp/category/event/xmas,イベント
+34,3.0,4,特集ページ（父の日）,https://example-test-flower.jp/category/event/fathers-day,イベント
+35,3.0,4,特集ページ（バレンタインデー）,https://example-test-flower.jp/category/event/valentine,イベント
+36,3.0,4,特集ページ（季節の変わり目）,https://example-test-flower.jp/category/event/seasonal,イベント
+37,3.0,4,特集ページ（敬老の日）,https://example-test-flower.jp/category/event/respect-elderly,イベント
+38,3.0,4,特集ページ（ハロウィン）,https://example-test-flower.jp/category/event/halloween,イベント
+39,3.0,4,特集ページ（年賀・新年）,https://example-test-flower.jp/category/event/new-year,イベント
+40,3.0,4,特集ページ（お悔やみ・葬儀）,https://example-test-flower.jp/category/event/funeral,イベント
+41,3.0,4,特集ページ（盆）,https://example-test-flower.jp/category/event/bon,イベント
+42,3.0,4,特集ページ（七夕）,https://example-test-flower.jp/category/event/tanabata,イベント
+43,3.0,4,特集ページ（節分）,https://example-test-flower.jp/category/event/setsubun,イベント
+44,3.0,4,特集ページ（十五夜）,https://example-test-flower.jp/category/event/harvest-moon,イベント
+45,3.0,4,特集ページ（還暦祝い・長寿祝い）,https://example-test-flower.jp/category/scene/kanreki,特集
+46,3.0,4,特集ページ（出産祝い）,https://example-test-flower.jp/category/scene/baby-shower,特集
+47,3.0,4,特集ページ（開店祝い・開業祝い）,https://example-test-flower.jp/category/scene/opening,特集
+48,3.0,4,特集ページ（お祝い返し）,https://example-test-flower.jp/category/scene/return-gift,特集
+49,3.0,4,特集ページ（お見舞い）,https://example-test-flower.jp/category/scene/hospital-visit,特集
+50,3.0,4,特集ページ（新築引っ越し祝い）,https://example-test-flower.jp/category/scene/housewarming,特集
+51,3.0,4,特集ページ（プロポーズ）,https://example-test-flower.jp/category/scene/propose,特集
+52,3.0,4,特集ページ（退職祝い）,https://example-test-flower.jp/category/scene/retirement,特集
+53,3.0,4,特集ページ（結婚記念日）,https://example-test-flower.jp/category/scene/anniversary,特集
+54,3.0,4,特集ページ（結婚祝い）,https://example-test-flower.jp/category/scene/wedding,特集
+55,3.0,4,特集ページ（退院祝い・快気祝い）,https://example-test-flower.jp/category/scene/recovery,特集
+56,1.0,2,ログイン,https://example-test-flower.jp/login,ユーザー
+57,1.0,2,アカウント登録,https://example-test-flower.jp/register,ユーザー
+58,1.0,2,マイページ,https://example-test-flower.jp/mypage,ユーザー
+59,1.0,2,パスワードリセット,https://example-test-flower.jp/password-reset,ユーザー
+60,1.0,2,お届け先情報入力,https://example-test-flower.jp/shipping,購入フロー
+61,1.0,2,支払い情報入力,https://example-test-flower.jp/payment,購入フロー
+62,1.0,2,利用規約,https://example-test-flower.jp/terms,ガイドライン
+63,1.0,2,プライバシーポリシー,https://example-test-flower.jp/privacy,ガイドライン
+64,1.0,2,FAQ,https://example-test-flower.jp/faq,サポート
+65,1.0,2,会社概要,https://example-test-flower.jp/about,ガイドライン
+66,2.0,3,セール商品,https://example-test-flower.jp/category/sale,キャンペーン
+67,2.0,3,新商品,https://example-test-flower.jp/category/new-arrivals,最新情報
+68,2.0,3,人気商品ランキング,https://example-test-flower.jp/category/ranking,ランキング
+69,2.0,3,詳細検索,https://example-test-flower.jp/search/advanced,検索

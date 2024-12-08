@@ -5,14 +5,14 @@ from importlib import import_module
 st.set_page_config(layout="wide")
 # URLクエリパラメータで現在のカテゴリを判定
 query_params = st.query_params  # st.experimental_get_query_params を st.query_params に置き換え
-category = query_params.get("category", "marketing")  # 存在しない場合は "marketing"
+category = query_params.get("category", "sales")  # 存在しない場合は "marketing"
 if isinstance(category, list):  # クエリパラメータはリスト形式で返される可能性がある
     category = category[0]
 
 # デフォルトページを設定
 default_page = {
-    "marketing": "timeline",
     "sales": "sales",
+    "marketing": "timeline",
     "finance": "cashflow"
 }.get(category, "none")  # カテゴリが無効の場合は "none"
 
