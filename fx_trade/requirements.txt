@@ -13,3 +13,4 @@ seaborn==0.13.2
 TA_Lib==0.4.28
 tweepy==4.14.0
 urllib3==1.26.18
+Cython==3.0.9
