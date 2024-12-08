@@ -5,7 +5,7 @@ import os
 
 # ベースディレクトリを設定
 BASE_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
-csv_path = os.path.join(BASE_DIR, "csv_data", "orders.csv")
+csv_path = os.path.join(BASE_DIR, "csv_data_up", "orders.csv")
 
 # CSVファイルの存在を確認
 if not os.path.exists(csv_path):
