@@ -2,63 +2,198 @@
 import tweepy
 import requests
 from bs4 import BeautifulSoup
-import requests
-from selenium import webdriver
-from selenium.webdriver.chrome.service import Service
-from selenium.webdriver.common.by import By
-from selenium.webdriver.support.ui import WebDriverWait
-from selenium.webdriver.support import expected_conditions as EC
-from webdriver_manager.chrome import ChromeDriverManager
-import json
-import tweepy
 import os
+import json
 import re
-import schedule
-import time
-import random
 from datetime import datetime
 import pandas as pd
+import random
 import numpy as np
-import json
-import os
-import re
-from PIL import Image
+import logging
 
-# 環境変数からAPIキーとトークンを読み込み
-twitter_keys = {
-    'bearer_token': os.getenv('bearer_token'),
-    'consumer_key': os.getenv('consumer_key'),
-    'consumer_secret': os.getenv('consumer_secret'),
-    'access_token': os.getenv('access_token'),
-    'access_token_secret': os.getenv('access_token_secret')
-}
+# JSONファイルからAPIキーを読み込む関数
+def load_twitter_keys(json_file):
+    try:
+        with open(json_file, 'r') as file:
+            keys = json.load(file)
+        print("Twitter keys loaded successfully.")
+        return keys
+    except Exception as e:
+        print(f"Error loading Twitter keys: {e}")
+        raise e
 
-# Twitter認証
-twitter_client = tweepy.Client(
-    bearer_token=twitter_keys['bearer_token'],
-    consumer_key=twitter_keys['consumer_key'],
-    consumer_secret=twitter_keys['consumer_secret'],
-    access_token=twitter_keys['access_token'],
-    access_token_secret=twitter_keys['access_token_secret']
-)
+# キーをロード
+keys = load_twitter_keys('twitter_key_newsbot.json')
+# keys = load_twitter_keys('twitter_keys.json')
+
+# Tweepyを使ったTwitter認証
+try:
+    # v2クライアント
+    twitter_client = tweepy.Client(
+        bearer_token=keys['bearer_token'],
+        consumer_key=keys['consumer_key'],
+        consumer_secret=keys['consumer_secret'],
+        access_token=keys['access_token'],
+        access_token_secret=keys['access_token_secret']
+    )
+
+    # v1.1クライアント（画像アップロード用）
+    auth = tweepy.OAuth1UserHandler(
+        keys['consumer_key'],
+        keys['consumer_secret'],
+        keys['access_token'],
+        keys['access_token_secret']
+    )
+    api_v1 = tweepy.API(auth)
+
+    print("Twitter authentication successful.")
+except Exception as e:
+    print(f"Error during Twitter authentication: {e}")
+    raise e
 
 news_site = {
-     '21:00':[
+     '00:00':[
         'https://www.fashion-press.net/news/search/beauty',
         'https://prtimes.jp/fashion/',
         'https://follow.yahoo.co.jp/themes/09d859b7b0ad7d462236/',
     ],
-     '10:00':[
+     '00:30':[
         'https://prtimes.jp/topics/keywords/グッズ',
         'https://www.oricon.co.jp/news/tag/id/news_character/',
         'https://charalab.com/category/goods/',
     ],
-     '12:00':[
+     '01:00':[
         'https://prtimes.jp/entertainment/',
         'https://prtimes.jp/topics/keywords/カフェ',
         'https://follow.yahoo.co.jp/themes/0f949f1b2dbe62d60008/',
     ],
+     '02:30':[
+        'https://prtimes.jp/topics/keywords/スイーツ',
+        'https://www.fashion-press.net/words/899',
+        'https://www.oricon.co.jp/news/tag/id/sweets/',
+        'https://follow.yahoo.co.jp/themes/0b358ef990dbb2cd5353/',
+    ],
+     '01:45':[
+        'https://www.fashion-press.net/news/search/fashion',
+        'https://www.fashionsnap.com/article/news/fashion/?category=ファッション',
+        'https://prtimes.jp/topics/keywords/ファッション',
+    ],
+     '02:30':[
+        'https://prtimes.jp/topics/keywords/アニメ',
+        'https://prtimes.jp/topics/keywords/キャラクター/',
+        'https://www.fashion-press.net/words/936',
+        'https://news.yahoo.co.jp/search?p=キャラクター+アニメ%E3%80%80グッズ&ei=utf-8',
+    ],
+     '03:00':[
+        'https://news.yahoo.co.jp/ranking/access/photo',
+        'https://news.yahoo.co.jp/ranking/access/video',
+        'https://news.mynavi.jp/ranking/digital/',
+    ],
+     '03:30':[
+        'https://news.yahoo.co.jpcp=アニメ%E3%80%80グッズ&ei=utf-8',
+        'https://prtimes.jp/topics/keywords/キャラクターグッズ',
+        'https://news.mynavi.jp/ranking/digital/game/',
+    ],
+     '04:00':[
+        'https://www.fashion-press.net/news/search/beauty',
+        'https://prtimes.jp/fashion/',
+        'https://follow.yahoo.co.jp/themes/09d859b7b0ad7d462236/',
+    ],
+     '04:30':[
+        'https://prtimes.jp/topics/keywords/グッズ',
+        'https://www.oricon.co.jp/news/tag/id/news_character/',
+        'https://charalab.com/category/goods/',
+    ],
+     '05:00':[
+        'https://prtimes.jp/entertainment/',
+        'https://prtimes.jp/topics/keywords/カフェ',
+        'https://follow.yahoo.co.jp/themes/0f949f1b2dbe62d60008/',
+    ],
+     '05:30':[
+        'https://prtimes.jp/topics/keywords/スイーツ',
+        'https://www.fashion-press.net/words/899',
+        'https://www.oricon.co.jp/news/tag/id/sweets/',
+        'https://follow.yahoo.co.jp/themes/0b358ef990dbb2cd5353/',
+    ],
+     '06:00':[
+        'https://www.fashion-press.net/news/search/fashion',
+        'https://www.fashionsnap.com/article/news/fashion/?category=ファッション',
+        'https://prtimes.jp/topics/keywords/ファッション',
+    ],
+     '06:30':[
+        'https://prtimes.jp/topics/keywords/アニメ',
+        'https://prtimes.jp/topics/keywords/キャラクター/',
+        'https://www.fashion-press.net/words/936',
+        'https://news.yahoo.co.jp/search?p=キャラクター+アニメ%E3%80%80グッズ&ei=utf-8',
+    ],
+     '07:00':[
+        'https://news.yahoo.co.jp/ranking/access/photo',
+        'https://news.yahoo.co.jp/ranking/access/video',
+        'https://news.mynavi.jp/ranking/digital/',
+    ],
+     '07:30':[
+        'https://news.yahoo.co.jpcp=アニメ%E3%80%80グッズ&ei=utf-8',
+        'https://prtimes.jp/topics/keywords/キャラクターグッズ',
+        'https://news.mynavi.jp/ranking/digital/game/',
+    ],
+     '08:00':[
+        'https://www.fashion-press.net/news/search/beauty',
+        'https://prtimes.jp/fashion/',
+        'https://follow.yahoo.co.jp/themes/09d859b7b0ad7d462236/',
+    ],
+     '08:30':[
+        'https://prtimes.jp/topics/keywords/グッズ',
+        'https://www.oricon.co.jp/news/tag/id/news_character/',
+        'https://charalab.com/category/goods/',
+    ],
+     '09:00':[
+        'https://prtimes.jp/entertainment/',
+        'https://prtimes.jp/topics/keywords/カフェ',
+        'https://follow.yahoo.co.jp/themes/0f949f1b2dbe62d60008/',
+    ],
+     '09:30':[
+        'https://prtimes.jp/topics/keywords/スイーツ',
+        'https://www.fashion-press.net/words/899',
+        'https://www.oricon.co.jp/news/tag/id/sweets/',
+        'https://follow.yahoo.co.jp/themes/0b358ef990dbb2cd5353/',
+    ],
+     '10:00':[
+        'https://www.fashion-press.net/news/search/fashion',
+        'https://www.fashionsnap.com/article/news/fashion/?category=ファッション',
+        'https://prtimes.jp/topics/keywords/ファッション',
+    ],
+     '10:30':[
+        'https://prtimes.jp/topics/keywords/アニメ',
+        'https://prtimes.jp/topics/keywords/キャラクター/',
+        'https://www.fashion-press.net/words/936',
+        'https://news.yahoo.co.jp/search?p=キャラクター+アニメ%E3%80%80グッズ&ei=utf-8',
+    ],
+     '11:00':[
+        'https://news.yahoo.co.jp/ranking/access/photo',
+        'https://news.yahoo.co.jp/ranking/access/video',
+        'https://news.mynavi.jp/ranking/digital/',
+    ],
+     '11:30':[
+        'https://news.yahoo.co.jpcp=アニメ%E3%80%80グッズ&ei=utf-8',
+        'https://prtimes.jp/topics/keywords/キャラクターグッズ',
+        'https://news.mynavi.jp/ranking/digital/game/',
+    ],
+     '12:00':[
+        'https://www.fashion-press.net/news/search/beauty',
+        'https://prtimes.jp/fashion/',
+        'https://follow.yahoo.co.jp/themes/09d859b7b0ad7d462236/',
+    ],
+     '12:30':[
+        'https://prtimes.jp/topics/keywords/グッズ',
+        'https://www.oricon.co.jp/news/tag/id/news_character/',
+        'https://charalab.com/category/goods/',
+    ],
      '13:00':[
+        'https://prtimes.jp/entertainment/',
+        'https://prtimes.jp/topics/keywords/カフェ',
+        'https://follow.yahoo.co.jp/themes/0f949f1b2dbe62d60008/',
+    ],
+     '13:30':[
         'https://prtimes.jp/topics/keywords/スイーツ',
         'https://www.fashion-press.net/words/899',
         'https://www.oricon.co.jp/news/tag/id/sweets/',
@@ -69,7 +204,49 @@ news_site = {
         'https://www.fashionsnap.com/article/news/fashion/?category=ファッション',
         'https://prtimes.jp/topics/keywords/ファッション',
     ],
+     '14:30':[
+        'https://prtimes.jp/topics/keywords/アニメ',
+        'https://prtimes.jp/topics/keywords/キャラクター/',
+        'https://www.fashion-press.net/words/936',
+        'https://news.yahoo.co.jp/search?p=キャラクター+アニメ%E3%80%80グッズ&ei=utf-8',
+    ],
      '15:00':[
+        'https://news.yahoo.co.jp/ranking/access/photo',
+        'https://news.yahoo.co.jp/ranking/access/video',
+        'https://news.mynavi.jp/ranking/digital/',
+    ],
+     '15:30':[
+        'https://news.yahoo.co.jpcp=アニメ%E3%80%80グッズ&ei=utf-8',
+        'https://prtimes.jp/topics/keywords/キャラクターグッズ',
+        'https://news.mynavi.jp/ranking/digital/game/',
+    ],
+     '16:00':[
+        'https://www.fashion-press.net/news/search/beauty',
+        'https://prtimes.jp/fashion/',
+        'https://follow.yahoo.co.jp/themes/09d859b7b0ad7d462236/',
+    ],
+     '16:30':[
+        'https://prtimes.jp/topics/keywords/グッズ',
+        'https://www.oricon.co.jp/news/tag/id/news_character/',
+        'https://charalab.com/category/goods/',
+    ],
+     '17:00':[
+        'https://prtimes.jp/entertainment/',
+        'https://prtimes.jp/topics/keywords/カフェ',
+        'https://follow.yahoo.co.jp/themes/0f949f1b2dbe62d60008/',
+    ],
+     '17:30':[
+        'https://prtimes.jp/topics/keywords/スイーツ',
+        'https://www.fashion-press.net/words/899',
+        'https://www.oricon.co.jp/news/tag/id/sweets/',
+        'https://follow.yahoo.co.jp/themes/0b358ef990dbb2cd5353/',
+    ],
+     '18:00':[
+        'https://www.fashion-press.net/news/search/fashion',
+        'https://www.fashionsnap.com/article/news/fashion/?category=ファッション',
+        'https://prtimes.jp/topics/keywords/ファッション',
+    ],
+     '18:30':[
         'https://prtimes.jp/topics/keywords/アニメ',
         'https://prtimes.jp/topics/keywords/キャラクター/',
         'https://www.fashion-press.net/words/936',
@@ -80,7 +257,49 @@ news_site = {
         'https://news.yahoo.co.jp/ranking/access/video',
         'https://news.mynavi.jp/ranking/digital/',
     ],
+     '19:30':[
+        'https://news.yahoo.co.jpcp=アニメ%E3%80%80グッズ&ei=utf-8',
+        'https://prtimes.jp/topics/keywords/キャラクターグッズ',
+        'https://news.mynavi.jp/ranking/digital/game/',
+    ],
+     '20:00':[
+        'https://www.fashion-press.net/news/search/beauty',
+        'https://prtimes.jp/fashion/',
+        'https://follow.yahoo.co.jp/themes/09d859b7b0ad7d462236/',
+    ],
      '20:30':[
+        'https://prtimes.jp/topics/keywords/グッズ',
+        'https://www.oricon.co.jp/news/tag/id/news_character/',
+        'https://charalab.com/category/goods/',
+    ],
+     '21:00':[
+        'https://prtimes.jp/entertainment/',
+        'https://prtimes.jp/topics/keywords/カフェ',
+        'https://follow.yahoo.co.jp/themes/0f949f1b2dbe62d60008/',
+    ],
+     '21:30':[
+        'https://prtimes.jp/topics/keywords/スイーツ',
+        'https://www.fashion-press.net/words/899',
+        'https://www.oricon.co.jp/news/tag/id/sweets/',
+        'https://follow.yahoo.co.jp/themes/0b358ef990dbb2cd5353/',
+    ],
+     '22:00':[
+        'https://www.fashion-press.net/news/search/fashion',
+        'https://www.fashionsnap.com/article/news/fashion/?category=ファッション',
+        'https://prtimes.jp/topics/keywords/ファッション',
+    ],
+     '22:30':[
+        'https://prtimes.jp/topics/keywords/アニメ',
+        'https://prtimes.jp/topics/keywords/キャラクター/',
+        'https://www.fashion-press.net/words/936',
+        'https://news.yahoo.co.jp/search?p=キャラクター+アニメ%E3%80%80グッズ&ei=utf-8',
+    ],
+     '23:00':[
+        'https://news.yahoo.co.jp/ranking/access/photo',
+        'https://news.yahoo.co.jp/ranking/access/video',
+        'https://news.mynavi.jp/ranking/digital/',
+    ],
+     '23:30':[
         'https://news.yahoo.co.jpcp=アニメ%E3%80%80グッズ&ei=utf-8',
         'https://prtimes.jp/topics/keywords/キャラクターグッズ',
         'https://news.mynavi.jp/ranking/digital/game/',
@@ -138,34 +357,34 @@ def scrape_news(url):
                     detail_response = requests.get(detail_url, headers=headers)
                     detail_response.raise_for_status()
                     detail_soup = BeautifulSoup(detail_response.content, 'html.parser')
-                    #img_tag = detail_soup.find('img')
-                    #img_url = img_tag['src'] if img_tag else None
+                    img_tag = detail_soup.find('img')
+                    img_url = img_tag['src'] if img_tag else None
                       
             elif '/アニメ' in url:
                 article = soup.find('article', class_='item item-ordinary')
                 title_tag = article.find('h3', class_='title-item')  # 修正箇所
                 link_tag = article.find('a', class_='link-title-item')
                 
-                # 画像URLをstyle属性から取得
-                #style = article.find('a', class_='link-thumbnail')['style']
-                #img_url = re.search(r'url\((.*?)\)', style).group(1)
+                #画像URLをstyle属性から取得
+                style = article.find('a', class_='link-thumbnail')['style']
+                img_url = re.search(r'url\((.*?)\)', style).group(1)
                 
-                # img_tagを作成
-                #soup = BeautifulSoup('<img src="{}">'.format(img_url), 'html.parser')
-                #img_tag = soup.find('img')
+                #img_tagを作成
+                soup = BeautifulSoup('<img src="{}">'.format(img_url), 'html.parser')
+                img_tag = soup.find('img')
             
             elif '/カフェ' in url:
                 article = soup.find('article', class_='item item-ordinary')
                 title_tag = article.find('h3', class_='title-item')  # 修正箇所
                 link_tag = article.find('a', class_='link-title-item')
                 
-                # 画像URLをstyle属性から取得
-                #style = article.find('a', class_='link-thumbnail')['style']
-                #img_url = re.search(r'url\((.*?)\)', style).group(1)
+                #画像URLをstyle属性から取得
+                style = article.find('a', class_='link-thumbnail')['style']
+                img_url = re.search(r'url\((.*?)\)', style).group(1)
                 
-                # img_tagを作成
-                #soup = BeautifulSoup('<img src="{}">'.format(img_url), 'html.parser')
-                #img_tag = soup.find('img')
+                #img_tagを作成
+                soup = BeautifulSoup('<img src="{}">'.format(img_url), 'html.parser')
+                img_tag = soup.find('img')
 
             elif '/キャラクター/' in url:
                 article = soup.find('article', class_='item item-ordinary')
@@ -173,12 +392,12 @@ def scrape_news(url):
                 link_tag = article.find('a', class_='link-title-item')
                 
                 # 画像URLをstyle属性から取得
-                #style = article.find('a', class_='link-thumbnail')['style']
-                #img_url = re.search(r'url\((.*?)\)', style).group(1)
+                style = article.find('a', class_='link-thumbnail')['style']
+                img_url = re.search(r'url\((.*?)\)', style).group(1)
                 
                 # img_tagを作成
-                #soup = BeautifulSoup('<img src="{}">'.format(img_url), 'html.parser')
-                #img_tag = soup.find('img')
+                soup = BeautifulSoup('<img src="{}">'.format(img_url), 'html.parser')
+                img_tag = soup.find('img')
                 
             elif '/キャラクターグッズ' in url:
                 article = soup.find('article', class_='item item-ordinary')
@@ -186,79 +405,79 @@ def scrape_news(url):
                 link_tag = article.find('a', class_='link-title-item')
                 
                 # 画像URLをstyle属性から取得
-                #style = article.find('a', class_='link-thumbnail')['style']
-                #img_url = re.search(r'url\((.*?)\)', style).group(1)
+                style = article.find('a', class_='link-thumbnail')['style']
+                img_url = re.search(r'url\((.*?)\)', style).group(1)
                 
                 # img_tagを作成
-                #soup = BeautifulSoup('<img src="{}">'.format(img_url), 'html.parser')
-                #img_tag = soup.find('img')
+                soup = BeautifulSoup('<img src="{}">'.format(img_url), 'html.parser')
+                img_tag = soup.find('img')
             elif '/グッズ' in url:
                 article = soup.find('article', class_='item item-ordinary')
                 title_tag = article.find('h3', class_='title-item')  # 修正箇所
                 link_tag = article.find('a', class_='link-title-item')
                 
                 # 画像URLをstyle属性から取得
-                #style = article.find('a', class_='link-thumbnail')['style']
-                #img_url = re.search(r'url\((.*?)\)', style).group(1)
+                style = article.find('a', class_='link-thumbnail')['style']
+                img_url = re.search(r'url\((.*?)\)', style).group(1)
                 
                 # img_tagを作成
-                #soup = BeautifulSoup('<img src="{}">'.format(img_url), 'html.parser')
-                #img_tag = soup.find('img')
+                soup = BeautifulSoup('<img src="{}">'.format(img_url), 'html.parser')
+                img_tag = soup.find('img')
             elif '/スイーツ' in url:
                 article = soup.find('article', class_='item item-ordinary')
                 title_tag = article.find('h3', class_='title-item')  # 修正箇所
                 link_tag = article.find('a', class_='link-title-item')
                 
                 # 画像URLをstyle属性から取得
-                #style = article.find('a', class_='link-thumbnail')['style']
-                #img_url = re.search(r'url\((.*?)\)', style).group(1)
+                style = article.find('a', class_='link-thumbnail')['style']
+                img_url = re.search(r'url\((.*?)\)', style).group(1)
                 
                 # img_tagを作成
-                #soup = BeautifulSoup('<img src="{}">'.format(img_url), 'html.parser')
-                #img_tag = soup.find('img')
+                soup = BeautifulSoup('<img src="{}">'.format(img_url), 'html.parser')
+                img_tag = soup.find('img')
             elif '/ファッション' in url:
                 article = soup.find('article', class_='item item-ordinary')
                 title_tag = article.find('h3', class_='title-item')  # 修正箇所
                 link_tag = article.find('a', class_='link-title-item')
                 
                 # 画像URLをstyle属性から取得
-                #style = article.find('a', class_='link-thumbnail')['style']
-                #img_url = re.search(r'url\((.*?)\)', style).group(1)
+                style = article.find('a', class_='link-thumbnail')['style']
+                img_url = re.search(r'url\((.*?)\)', style).group(1)
                 
                 # img_tagを作成
-                #soup = BeautifulSoup('<img src="{}">'.format(img_url), 'html.parser')
-                #img_tag = soup.find('img')
+                soup = BeautifulSoup('<img src="{}">'.format(img_url), 'html.parser')
+                img_tag = soup.find('img')
             elif '/ホテル' in url:
                 article = soup.find('article', class_='item item-ordinary')
                 title_tag = article.find('h3', class_='title-item')  # 修正箇所
                 link_tag = article.find('a', class_='link-title-item')
                 
                 # 画像URLをstyle属性から取得
-                #style = article.find('a', class_='link-thumbnail')['style']
-                #img_url = re.search(r'url\((.*?)\)', style).group(1)
+                style = article.find('a', class_='link-thumbnail')['style']
+                img_url = re.search(r'url\((.*?)\)', style).group(1)
                 
                 # img_tagを作成
-                #soup = BeautifulSoup('<img src="{}">'.format(img_url), 'html.parser')
-                #img_tag = soup.find('img')
+                soup = BeautifulSoup('<img src="{}">'.format(img_url), 'html.parser')
+                img_tag = soup.find('img')
             elif '/旅館' in url:
                 article = soup.find('article', class_='item item-ordinary')
                 title_tag = article.find('h3', class_='title-item')  # 修正箇所
                 link_tag = article.find('a', class_='link-title-item')
                 
                 # 画像URLをstyle属性から取得
-                #style = article.find('a', class_='link-thumbnail')['style']
-                #img_url = re.search(r'url\((.*?)\)', style).group(1)
+                style = article.find('a', class_='link-thumbnail')['style']
+                img_url = re.search(r'url\((.*?)\)', style).group(1)
                 
                 # img_tagを作成
-                #soup = BeautifulSoup('<img src="{}">'.format(img_url), 'html.parser')
-                #img_tag = soup.find('img')    
+                soup = BeautifulSoup('<img src="{}">'.format(img_url), 'html.parser')
+                img_tag = soup.find('img')    
         elif 'charalab.com' in url:
             if 'goods/' in url:
                 article = soup.find('article')
                 title_tag = article.find('div', class_='article-list_title').find('p')
                 link_tag = article.find('a')     
                 # 画像タグを取得
-                #img_tag = article.find('div', class_='article-list_img').find('img')
+                img_tag = article.find('div', class_='article-list_img').find('img')
                 
         elif 'follow.yahoo.co.jp' in url:
             article = soup.find('li', class_='ThemeArticleItem_ThemeArticleItem__1dU5j')
@@ -274,27 +493,27 @@ def scrape_news(url):
                 img_style = article.find('div', class_='img')['style']
                 img_url = re.search(r'url\((.*?)\)', img_style).group(1)        
                 # img_tagを作成
-                #soup_img = BeautifulSoup('<img src="{}">'.format(img_url), 'html.parser')
-                #img_tag = soup_img.find('img')
+                soup_img = BeautifulSoup('<img src="{}">'.format(img_url), 'html.parser')
+                img_tag = soup_img.find('img')
                 
         elif 'https://news.yahoo.co.jp/search' in url:
             if 'キャラクター+アニメ' in url: 
                 article = soup.find('li', class_='newsFeed_item')
                 title_tag = article.find('div', class_='newsFeed_item_title')
                 link_tag = article.find('a', class_='sc-110wjhy-2')        
-                #img_tag = article.find('img', class_='sc-1z2z0a-1')
+                img_tag = article.find('img', class_='sc-1z2z0a-1')
                 
             if '=アニメ%' in url: 
                 article = soup.find('li', class_='newsFeed_item')
                 title_tag = article.find('div', class_='newsFeed_item_title')
                 link_tag = article.find('a', class_='sc-110wjhy-2')        
-                #img_tag = article.find('img', class_='sc-1z2z0a-1')
+                img_tag = article.find('img', class_='sc-1z2z0a-1')
                 
         elif 'https://news.yahoo.co.jp/ranking/access' in url:
             article = soup.find('li', class_='newsFeed_item')
             title_tag = article.find('div', class_='newsFeed_item_title')
             link_tag = article.find('a', class_='newsFeed_item_link')
-            #img_tag = article.find('picture').find('img', class_='sc-1z2z0a-1')
+            img_tag = article.find('picture').find('img', class_='sc-1z2z0a-1')
             
         elif 'fashion-press.net' in url:
             article = soup.find('div', class_='fp_list_each')
@@ -310,8 +529,8 @@ def scrape_news(url):
             article_response.raise_for_status()
             article_soup = BeautifulSoup(article_response.content, 'html.parser')
             # 1つ目の画像を取得
-            #img_tag = article_soup.find('figure').find('img', src=True)
-            #img_url = img_tag['src'] if img_tag else None
+            img_tag = article_soup.find('figure').find('img', src=True)
+            img_url = img_tag['src'] if img_tag else None
 
             # 相対URLを完全なURLに変換
             if img_url and not img_url.startswith('http'):
@@ -332,19 +551,19 @@ def scrape_news(url):
             article = soup.find('div', class_='rankingtList_listNode_info')
             title_tag = article.find('h3', class_='rankingtList_listNode_catch')
             link_tag = article.find_parent('a', href=True)  # Assuming the link is in the parent <a> tag
-            #img_tag = None  # No image tag is provided in the given HTML structure
+            img_tag = None  # No image tag is provided in the given HTML structure
 
         elif 'https://news.mynavi.jp/ranking/digital/' in url:
             article = soup.find('div', class_='rankingtList_listNode_info')
             title_tag = article.find('h3', class_='rankingtList_listNode_catch')
             link_tag = article.find_parent('a', href=True)  # Assuming the link is in the parent <a> tag
-            #img_tag = None  # No image tag is provided in the given HTML structure
+            img_tag = None  # No image tag is provided in the given HTML structure
 
         elif 'https://www.fashionsnap.com/article/news/fashion/?category' in url:
             article = soup.find('div', class_='_144h2oc0')
             title_tag = article.find('p', class_='_144h2oc1')
             link_tag = article.find('a', class_='_120s2jp0', href=True)
-            #img_tag = article.find('img', class_='_120s2jp1')
+            #¥img_tag = article.find('img', class_='_120s2jp1')
 
         else:
             print("No matching site pattern found.")
@@ -386,34 +605,32 @@ def scrape_news(url):
         print(f"Error scraping news: {e}")
         return None
 
+    def resize_image(image_path, max_size=5 * 1024 * 1024):
+        """Resize image to be under the max size (in bytes)."""
+        with Image.open(image_path) as img:
+            if img.size[0] * img.size[1] > max_size:
+                scale_factor = (max_size / (img.size[0] * img.size[1])) ** 0.5
+                new_size = (int(img.size[0] * scale_factor), int(img.size[1] * scale_factor))
+                img = img.resize(new_size, Image.ANTIALIAS)
+                img.save(image_path, optimize=True, quality=85)
+    
+        return image_path
+
 # main()の実装
 def main():
-    twitter_keys = load_twitter_keys()
+    # 必要なJSONファイル名を指定してキーをロード
+    twitter_keys = load_twitter_keys('twitter_keys.json')
     if not twitter_keys:
         print("Twitter keys not loaded.")
         return
-        
-    api = authenticate_twitter(twitter_keys)
-    if not api:
-        print('Twitter authentication failed.')
-        return
-    
+
+    # URLをランダムに選択
     url = select_random_url()
     if not url:
         print("No URL selected.")
         return
 
-    # def resize_image(image_path, max_size=5 * 1024 * 1024):
-    #     """Resize image to be under the max size (in bytes)."""
-    #     with Image.open(image_path) as img:
-    #         if img.size[0] * img.size[1] > max_size:
-    #             scale_factor = (max_size / (img.size[0] * img.size[1])) ** 0.5
-    #             new_size = (int(img.size[0] * scale_factor), int(img.size[1] * scale_factor))
-    #             img = img.resize(new_size, Image.ANTIALIAS)
-    #             img.save(image_path, optimize=True, quality=85)
-    
-    #     return image_path
-        
+    # ニュースをスクレイピング
     news_data = scrape_news(url)
     if news_data:
         title = news_data['title']
@@ -421,39 +638,29 @@ def main():
         img_url = news_data.get('img_url')
         post_content = f"{title}\n{link}"
         print(f"post_content:{post_content}")
+
         try:
             if img_url:
-                # 画像をダウンロード
+                # 画像をダウンロードして一時保存
                 image_path = '/tmp/news_image.jpg'
                 with open(image_path, 'wb') as img_file:
                     img_file.write(requests.get(img_url).content)
+                
+                # 画像をアップロードしてツイート投稿
                 try:
-                    # 画像をアップロードし、メディアIDを取得
-                    auth = tweepy.OAuth1UserHandler(
-                        os.getenv('consumer_key'),
-                        os.getenv('consumer_secret'),
-                        os.getenv('access_token'),
-                        os.getenv('access_token_secret')
-                    )
-                    api = tweepy.API(auth)
-                    media = api.media_upload(image_path)
-                    media_id = media.media_id
-                   
-                    # ツイートを投稿
-                    twitter_client.create_tweet(text=post_content)
-                    # , media_ids=[media_id] 
-                    # 画像ファイルを削除
+                    media = api_v1.media_upload(image_path)
+                    twitter_client.create_tweet(text=post_content, media_ids=[media.media_id])
+                    print(f"Posted with image: {post_content}")
+                    
+                    # 使用した画像を削除
                     os.remove(image_path)
-                    print(f"Posted: {post_content}")
                 except tweepy.TweepyException as e:
-                    print(f"Error posting tweet: {e}")
+                    print(f"Error posting tweet with image: {e}")
             else:
-                try:
-                    # 画像なしのツイートを投稿
-                    twitter_client.create_tweet(text=post_content)
-                    print(f"Posted: {post_content}")
-                except tweepy.TweepyException as e:
-                    print(f"Error posting tweet: {e}")
+                # 画像なしのツイート投稿
+                twitter_client.create_tweet(text=post_content)
+                
+                print(f"Posted: {post_content}")
         except Exception as e:
             print(f"Unexpected error: {e}")
     else:
@@ -462,6 +669,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
-#twitter_client.create_tweet(text=post_content, media_ids=[media_id])
-
