@@ -6,7 +6,7 @@ import os
 @st.cache_data
 def load_data():
     # 絶対パスでCSVフォルダを指定
-    csv_dir = "/Users/kenjiokabe/github/streamlit/csv_data"
+    csv_dir = "/Users/kenjiokabe/github/streamlit/csv_data_up"
 
     # CSVファイルのパスを取得
     orders_path = os.path.join(csv_dir, "orders.csv")

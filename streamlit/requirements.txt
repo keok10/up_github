@@ -16,7 +16,7 @@ chardet==5.2.0
 checks==0.2
 colorama==0.4.6
 ConfigParser==7.1.0
-cryptography==41.0.3
+# cryptography==41.0.3
 cudf==0.6.1.post1
 Cython==3.0.11
 dask==2024.11.2
@@ -68,7 +68,8 @@ pycurl==7.45.3
 PyInstaller==6.11.1
 pyobjc_framework_Cocoa==10.1
 pyobjc_framework_Quartz==10.1
-# pyodide==0.0.2
+#pyodide==0.0.2
+#pyOpenSSL==23.2.0
 pyOpenSSL==24.3.0
 pyperf==2.8.1
 PyQt4==4.11.4
