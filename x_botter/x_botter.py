@@ -666,5 +666,6 @@ def main():
     else:
         print("No news data found.")
 
+
 if __name__ == "__main__":
     main()
